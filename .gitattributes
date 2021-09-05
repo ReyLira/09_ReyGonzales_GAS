@@ -1,2 +1,63 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+function myFunction() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var header = "";
+  var detail = [];
+  var datosAEnviar = [];
+
+  ss.getRange("A2:D4").getValues().forEach(v => {
+    header = v[0]
+  })
+
+  ss.getRange("A2:D4").getValues().forEach(v => {
+    if (v[0] == header) {
+      const data = {
+        pariente: v[1],
+        nombreM: v[2],
+        correo: v[3]
+      }
+      detail.push(data);
+    }
+  })
+
+  const data = {
+    nombreA: header,
+    detalle: detail
+  }
+
+  datosAEnviar.push(data);
+
+  datosAEnviar.forEach(v => {
+    v.detalle.forEach(i => {
+
+      const idCopy = copySlide();
+      const getSlide = SlidesApp.openById(idCopy);
+
+      getSlide.getSlides().forEach(v => {
+        v.getShapes().forEach(f => {
+          f.getText().replaceAllText('{{nombreMama}}', i.nombreM)
+        })
+      })
+      getSlide.saveAndClose();
+
+
+
+
+      /*MailApp.sendEmail(
+        i.correo,
+        "TPS report status",
+        `El correo te lo envia tu ${i.pariente} ${v.nombreA} para ti ${i.nombreM}`);*/
+    })
+  })
+
+}
+
+
+function copySlide() {
+  const saveCopy = DriveApp.getFileById('1kXchyIGy1K5yju0Wffv-bBgJ_FOxkGoxcudkYNReMDE').makeCopy('Copia Carta DDM', DriveApp.getFolderById('1wwVnBXXLcZJkXNMPNlqAg_W0AkwFzkzr'));
+  return saveCopy.getId();
+}
+
+
+
